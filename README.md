@@ -7,7 +7,7 @@ I was working on a poject and I needed something to zip and unzip local director
 * not being developer-friendly
 * having odd behaviors (like zipping the whole path to root along with the directory)
 
-So I wrote this to provide something free of three problems!
+So I wrote this to provide something free of the three problems!
 
 ## Installation
 
