@@ -1,0 +1,31 @@
+{
+  "name": "zip-local",
+  "version": "0.1.0",
+  "description": "zipping/uzipping local files and directories in one statement",
+  "main": "main.js",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha ./tests/*.test.js",
+    "posttest": "node ./tests/cleanup.js"
+  },
+  "keywords": [
+    "zip",
+    "unzip",
+    "async",
+    "sync",
+    "compression",
+    "zip-local",
+    "jszip"
+  ],
+  "author": "Mostafa Samir <mostafa.3210@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "async": "^1.4.2",
+    "jszip": "^2.5.0",
+    "q": "^1.4.1"
+  },
+  "devDependencies": {
+    "chai": "^3.2.0",
+    "mocha": "^2.3.0",
+    "rimraf": "^2.4.3"
+  }
+}
