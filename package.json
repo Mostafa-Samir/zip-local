@@ -1,6 +1,6 @@
 {
   "name": "zip-local",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "zipping/uzipping local files and directories in one statement",
   "main": "main.js",
   "scripts": {
