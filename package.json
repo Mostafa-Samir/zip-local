@@ -7,6 +7,10 @@
     "test": "./node_modules/.bin/mocha ./tests/*.test.js",
     "posttest": "node ./tests/cleanup.js"
   },
+  "directories": {
+    "lib": "libs",
+    "test": "tests"
+  },
   "keywords": [
     "zip",
     "unzip",
@@ -17,7 +21,17 @@
     "jszip"
   ],
   "author": "Mostafa Samir <mostafa.3210@gmail.com>",
-  "license": "MIT",
+  "license": {
+    "type": "MIT",
+    "url": "https://github.com/Mostafa-Samir/zip-local/blob/master/LICENSE"
+  },
+  "bugs" : {
+    "url": "https://github.com/Mostafa-Samir/zip-local/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Mostafa-Samir/zip-local.git"
+  },
   "dependencies": {
     "async": "^1.4.2",
     "jszip": "^2.5.0",
