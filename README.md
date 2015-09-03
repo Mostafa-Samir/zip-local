@@ -100,7 +100,7 @@ zipper.sync.unzip("pack.zip").save("../../hello");
 // export in memory
 var unzippedfs = zipper.sync.unzip("pack.zip").memory();
 
-// prints [ 'hello-world.txt', 'cpp/hello-world.cpp', 'java/hello-world.java' ]
+// prints ['hello-world.txt', 'cpp/hello-world.cpp', 'java/hello-world.java']
 console.log(unzippedfs.contents()); 
 
 // read file in buffer
