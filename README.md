@@ -107,8 +107,8 @@ console.log(unzippedfs.contents());
 var buff = unzippedfs.read("cpp/hello-world.cpp", "buffer");
 ```
 
-read the API documentations for furthur details.
+read the [API documentations](https://github.com/Mostafa-Samir/zip-local/wiki/API-Documentation) for furthur details.
 
 ## License
 
-MIT
+### MIT
