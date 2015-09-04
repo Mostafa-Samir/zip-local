@@ -2,7 +2,7 @@
 
 ## Why another one?!
 
-I was working on a poject and I needed something to zip and unzip local directories, so I went and searched on npm. I got quite a lot of results and all of them worked perfectly with files, but it when it came to directories each of them suffered from at least one of these three problems:
+I was working on a project and I needed something to zip and unzip local directories, so I went and searched on npm. I got quite a lot of results and all of them worked perfectly with files, but it when it came to directories each of them suffered from at least one of these three problems:
 * not being asynchronous
 * not being developer-friendly
 * having odd behaviors (like zipping the whole path to root along with the directory)
