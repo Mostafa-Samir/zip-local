@@ -1,7 +1,7 @@
 {
   "name": "zip-local",
-  "version": "0.1.2",
-  "description": "zipping/uzipping local files and directories in one statement",
+  "version": "0.1.3",
+  "description": "very simple zipping/uzipping of local files and directories in node.js",
   "main": "main.js",
   "scripts": {
     "test": "./node_modules/.bin/mocha ./tests/*.test.js",
