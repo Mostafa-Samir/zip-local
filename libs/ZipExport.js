@@ -233,21 +233,26 @@ ZipExport.prototype.save = function (_path, _callback) {
             process.chdir(parsed_path.dir);
         
         // write the new file
-        if (!this.save_async)
+        if (!this.save_async) {
+
             fs.writeFileSync(parsed_path.base, buff);
+
+            // change process's directory back
+            process.chdir(current_working_directory);
+        }
         else
             fs.writeFile(parsed_path.base, buff, function (err) {
                 
                 if (err)
                     throw err;
                 
+                // change process's directory back
+                process.chdir(current_working_directory);
+                
                 //invoke the callback
                 callback();
 
             });
-        
-        // change process's directory back
-        process.chdir(current_working_directory);
     }
     else {
         
