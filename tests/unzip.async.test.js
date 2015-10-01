@@ -60,7 +60,26 @@ describe("Unzipping asynchronously", function () {
                 done();
             });
         });
+    });
 
+    it("unzips a file directly from the buffer containing it", function (done) {
+        
+        var buff = fs.readFileSync("./tests/assets/hello.zip");
+        
+        zipper.unzip(buff, function (unzipped) {
+
+            localMemory.T5ZippedFS = unzipped.memory();
+
+            done();
+        });
+    });
+    
+    it("checks if the ZippedFS object contains correct data", function () {
+        
+        expect(localMemory.T5ZippedFS.contents()).to.include("hello/says-hello") &&
+        expect(localMemory.T5ZippedFS.read("hello/says-hello", 'text')).to.equal("Hello") &&
+        expect(localMemory.T5ZippedFS.contents()).to.include("hello/world/says-world") &&
+        expect(localMemory.T5ZippedFS.read("hello/world/says-world", 'text')).to.equal("World");
     });
 
 })

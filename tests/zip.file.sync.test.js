@@ -48,4 +48,22 @@ describe("Zipping files synchrnously", function () {
         });
     });
 
+    /* Test 5: zipping a file from the buffer containing it */
+    it("zips a file directly from the buffer containing it", function () {
+        
+        var buff = fs.readFileSync("./tests/assets/hello-world");
+
+        localMemory.T5ZippedBuffer = zipper.sync.zip(buff, "hello-world").memory();
+    });
+
+    /* Test 6: making sure that the zipped buffer from Test 5 contains correct data */
+    it("checks if the zipped buffer contains correct data (using JSZip)", function () {
+        
+        var zipped = new JSZip(localMemory.T5ZippedBuffer);
+        
+        expect(zipped.files).to.have.property("hello-world") &&
+        expect(zipped.file("hello-world").asText()).to.equal("Hello World.");
+
+    });
+
 });
