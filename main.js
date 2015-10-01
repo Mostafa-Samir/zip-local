@@ -4,6 +4,7 @@ var JSZip = require('jszip');
 var Q = require('q');
 var async = require('async')
 var ZipExport = require('./libs/ZipExport.js');
+var ZippedFS = require('./libs/ZippedFS.js');
 
 /*****************************************************************************************
 ******************************** PRIVATE HELPER FUNCTIONS ********************************
@@ -129,7 +130,7 @@ ZipLocal.sync = {} // container for the synchronous version of the the api
 
 /*
  * zips a given file/directory asynchronously
- * @param entity {String || Buffer}: the path to file/directory to zip or the buffer containing the file
+ * @param entity {String || Buffer || ZippedFS}: the path to file/directory to zip, the buffer containing the file or a ZippedFS object of an unzipped file
  * @param _callback {Function}: the function to be called when the zipping is done
  * @param _shiftedCallback {Function}: the callback shifted to last argument if entity is a Buffer (optional)
  */
@@ -191,6 +192,15 @@ ZipLocal.zip = function (entity, _callback, _shiftedCallback) {
         // invoke the callback
         callback(new ZipExport(zipped_obj, false, true));
     }
+
+    else if (entity instanceof ZippedFS) {
+
+        // the entity is a ZippedFS from an unzipped file
+        var callback = _callback || function () { };
+
+        //invoke the callback
+        callback(new ZipExport(entity.unzipped_file, false, true));
+    }
     else {
         throw new Error("Unsupported type: data is neither a path or a Buffer");
     }
@@ -238,7 +248,7 @@ ZipLocal.unzip = function (file, _callback) {
 
 /*
  * zips a given file/directory synchronously
- * @param entity {String || Buffer}: the path to the file/directory to zip or a buffer containing a file
+ * @param entity {String || Buffer || ZippedFS}: the path to the file/directory to zip, a buffer containing a file or a ZippedFS object of an unzipped file
  * @param buffer_name {String}: the name of the file if entity is buffer (optional)
  * @return {ZipExport}: the ZipExport object that contains exporting interfaces
  */
@@ -274,6 +284,13 @@ ZipLocal.sync.zip = function(entity, buffer_name) {
         // the entity is a buffer containing a file
 
         zipped_obj.file(buffer_name, entity);
+    }
+    else if (entity instanceof ZippedFS) {
+        
+        // the entity is a ZippedFS from an unzipped file
+        
+        //change the zipped_obj
+        zipped_obj = entity.unzipped_file;
     }
     else {
         throw new Error("Unsupported type: data is neither a path or a Buffer");
