@@ -129,113 +129,187 @@ ZipLocal.sync = {} // container for the synchronous version of the the api
 
 /*
  * zips a given file/directory asynchronously
- * @param _path {String}: the path to file/directory to zip
+ * @param entity {String || Buffer}: the path to file/directory to zip or the buffer containing the file
  * @param _callback {Function}: the function to be called when the zipping is done
+ * @param _shiftedCallback {Function}: the callback shifted to last argument if entity is a Buffer (optional)
  */
-ZipLocal.zip = function (_path, _callback) {
+ZipLocal.zip = function (entity, _callback, _shiftedCallback) {
     
-    var callback = _callback || function () { };
-
-    var normalized_path = path.normalize(_path);
     var zipped_obj = new JSZip();
-
-    fs.stat(normalized_path, function (err, stats) {
+    
+    if (typeof entity === "string") {
         
-        if (err)
-            throw err;
-
-        if (stats.isDirectory()) {
+        // the entity is a path pointing to a file or a directory 
+        
+        // the callback is not shifted 
+        var callback = _callback || function () { };
+        
+        var normalized_path = path.normalize(entity);
+        
+        fs.stat(normalized_path, function (err, stats) {
             
-            // start zipping the directory
-            Q.fcall(zip_dir, normalized_path, zipped_obj).then(function () {
+            if (err)
+                throw err;
+            
+            if (stats.isDirectory()) {
                 
-                // invoke the callback
-                callback(new ZipExport(zipped_obj, false, true));
-            }).done();
-        }
-        else {
-
-            var parsed_path = path.parse(normalized_path);
-            fs.readFile(normalized_path, function (err, file) {
+                // start zipping the directory
+                Q.fcall(zip_dir, normalized_path, zipped_obj).then(function () {
+                    
+                    // invoke the callback
+                    callback(new ZipExport(zipped_obj, false, true));
+                }).done();
+            }
+            else {
                 
-                if (err)
-                    throw err;
+                var parsed_path = path.parse(normalized_path);
+                fs.readFile(normalized_path, function (err, file) {
+                    
+                    if (err)
+                        throw err;
+                    
+                    zipped_obj.file(parsed_path.base, file);
+                    
+                    // invoke the callback
+                    callback(new ZipExport(zipped_obj, false, true));
 
-                zipped_obj.file(parsed_path.base, file);
+                });
+            }
+        });
+    }
+    else if (entity instanceof Buffer) {
+        
+        // the entity is a buffer containing a file
+        
+        // the _callback argument is now the name of the file in buffer
+        // the callback is shifted to _shiftedCallback argument
+        var name = _callback;
+        var callback = _shiftedCallback || function () { };
 
-                // invoke the callback
-                callback(new ZipExport(zipped_obj, false, true));
-
-            });
-        }
-    });
+        zipped_obj.file(name, entity);
+        
+        // invoke the callback
+        callback(new ZipExport(zipped_obj, false, true));
+    }
+    else {
+        throw new Error("Unsupported type: data is neither a path or a Buffer");
+    }
 }
 
 /*
  * unzips a given zip file asynchronously
- * @param _path {String}: the path to the zip file
+ * @param file {String || Buffer}: the path to the zip file or the buffer containing it
  * @param _callback {Function}: the function to be called when the unzipping is done
  */
-ZipLocal.unzip = function (_path, _callback) {
+ZipLocal.unzip = function (file, _callback) {
     
     var callback = _callback || function () { };
-
-    var normalized_path = path.normalize(_path);
-
-    fs.readFile(normalized_path, function (err, data) {
+    var zipped_obj = new JSZip();
+    
+    if (typeof file === "string") {
         
-        var zipped_obj = new JSZip();
-        zipped_obj.load(data);
+        // file is a path that points to a zip file
+        
+        var normalized_path = path.normalize(file);
+        
+        fs.readFile(normalized_path, function (err, data) {
+            
+            zipped_obj.load(data);
+            
+            //invoke the callback
+            callback(new ZipExport(zipped_obj, true, true))
+
+        });
+    }
+    else if (file instanceof Buffer) {
+        
+        // file is a Buffer that contains the data
+
+        zipped_obj.load(file);
         
         //invoke the callback
         callback(new ZipExport(zipped_obj, true, true))
-
-    });
+    }
+    else {
+        throw new Error("Unsupported type: data is neither a path or a Buffer");
+    }
 
 } 
 
 /*
  * zips a given file/directory synchronously
- * @param _path {String}: the path to the file/directory to zip
+ * @param entity {String || Buffer}: the path to the file/directory to zip or a buffer containing a file
+ * @param buffer_name {String}: the name of the file if entity is buffer (optional)
  * @return {ZipExport}: the ZipExport object that contains exporting interfaces
  */
-ZipLocal.sync.zip = function(_path) {
+ZipLocal.sync.zip = function(entity, buffer_name) {
     
-    var normalized_path = path.normalize(_path);
-    var stats = fs.statSync(normalized_path);
     var zipped_obj = new JSZip();
     
-    if(stats.isDirectory()) {
+    if (typeof entity === "string") {
         
-        // start zipping the directory
-        zip_dir_sync(normalized_path, zipped_obj);
+        // the entity is a path pointing to a file or a directory 
         
-        return new ZipExport(zipped_obj);
+        var normalized_path = path.normalize(entity);
+        var stats = fs.statSync(normalized_path);
+        
+        if (stats.isDirectory()) {
+            
+            // start zipping the directory
+            zip_dir_sync(normalized_path, zipped_obj);
+            
+            return new ZipExport(zipped_obj);
+        }
+        else {
+            
+            var parsed_path = path.parse(normalized_path);
+            var file = fs.readFileSync(normalized_path);
+            
+            zipped_obj.file(parsed_path.base, file);
+           
+        }
+    }
+    else if (entity instanceof Buffer) {
+        
+        // the entity is a buffer containing a file
+
+        zipped_obj.file(buffer_name, entity);
     }
     else {
-        
-        var parsed_path = path.parse(normalized_path);
-        var file = fs.readFileSync(normalized_path);
-        
-        zipped_obj.file(parsed_path.base, file);
-        
-        return new ZipExport(zipped_obj);
+        throw new Error("Unsupported type: data is neither a path or a Buffer");
     }
+
+    return new ZipExport(zipped_obj);
 }
 
 /*
  * unzips a given zip file synchrnously
- * @param _path {String}: the path to the zip file
+ * @param file {String || Buffer}: the path to the zip file or the buffer containing it
  * @return {ZipExport}: the ZipExport object that contains exporting interfaces
  */
-ZipLocal.sync.unzip = function (_path) {
-
-    var normalized_path = path.normalize(_path);
-
-    var data = fs.readFileSync(_path);
-
+ZipLocal.sync.unzip = function (file) {
+    
     var zipped_obj = new JSZip();
-    zipped_obj.load(data);
+    
+    if (typeof file === "string") {
+        
+        // file is a path that points to a zip file
+
+        var normalized_path = path.normalize(file);
+        
+        var data = fs.readFileSync(normalized_path);
+        
+        zipped_obj.load(data);
+    }
+    else if (file instanceof Buffer) {
+
+        // file is a Buffer that contains the data
+
+        zipped_obj.load(file);
+    }
+    else {
+        throw new Error("Unsupported type: data is neither a path or a Buffer");
+    }
 
     return new ZipExport(zipped_obj, true, false);
 }; 
