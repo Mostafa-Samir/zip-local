@@ -150,10 +150,10 @@ zipper.unzip('package.zip', function(unzipped) {
 
     var unzippedFS = unzipped.memory();
     var files = unzippedFS.contents();
-    var notExecutableRegExp = new RegExp(/^[^.]+$|\.(?!(sh|exe|bat)$)([^.]+$)/);
+    var notExecRegExp = new RegExp(/^[^.]+$|\.(?!(sh|exe|bat)$)([^.]+$)/);
     
     files.forEach(function (file) {
-        if(!notExecutableRegExp.test(file))
+        if(!notExecRegExp.test(file))
             unzipped.lowLevel().remove(file);
     });
     
