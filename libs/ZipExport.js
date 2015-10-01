@@ -174,6 +174,15 @@ function ZipExport(jszip, unzipped, async) {
 }
 
 /*
+ * returns the associated JSZip object for low level operations
+ * @returns {JSZip}: the associated JSZip object
+ */
+ZipExport.prototype.lowLevel = function () {
+
+    return this.content;
+} 
+
+/*
  * sets the object so that the exported format will be compressed
  */
 ZipExport.prototype.compress = function () {
