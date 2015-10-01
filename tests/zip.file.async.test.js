@@ -83,4 +83,29 @@ describe("Zipping files asynchrnously", function () {
 
     });
 
+    /* Test 7: zipping a ZippedFS from an unzipped file */
+    it("zips a ZippedFS form a previously unzipped files", function (done) {
+        
+        var unzippedfs = zipper.sync.unzip("./tests/assets/hello.zip").memory();
+        
+        zipper.zip(unzippedfs, function (zipped) {
+
+            localMemory.T7ZippedBuffer = zipped.memory();
+
+            done();
+        });
+    });
+    
+    /* Test 8: making sure that the zipped buffer from Test 7 contains correct data */
+    it("checks if the zipped buffer contains correct data", function () {
+        
+        var T8ZippedFS = zipper.sync.unzip(localMemory.T7ZippedBuffer).memory();
+        
+        expect(T8ZippedFS.contents()).to.include("hello/says-hello") &&
+        expect(T8ZippedFS.read("hello/says-hello", 'text')).to.equal("Hello") &&
+        expect(T8ZippedFS.contents()).to.include("hello/world/says-world") &&
+        expect(T8ZippedFS.read("hello/world/says-world", 'text')).to.equal("World");
+
+    });
+
 });
