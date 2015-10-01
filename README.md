@@ -111,7 +111,7 @@ var buff = unzippedfs.read("cpp/hello-world.cpp", "buffer");
 
 Imagine a serevr that needs to zip files it receives through its clients and send the zipped file to the client. When the file is received it resides in a buffer in memory, and to be able to zip it with the library (using the methods described so far) we must first save the file to local storage then zip it using its path so that the library would read it back to memory and zip it. This is definitely ineffcient and wasteful of the serevr's time and resources.
 
-To solve this issue, starting from v0.2.0 you can zip/unzip a file directly from the buffer containing it in memory or zip an entire <code>ZippedFS</code> object from a previously unzipped file. This could be done simply by passing the buffer or the <code>ZippedFS</code> object to the zip/unzip methods instead of the path, and it works for both asynchronous and synchronous versions. Notice that in the case of zipping a buffer you'll need to pass an extra argument after the buffer which is the name of the file that will be included in the zip.
+To solve this issue, starting from v0.2.0 you can zip/unzip a file directly from the buffer containing it in memory or zip an entire <code>ZippedFS</code> object from a previously unzipped file. This could be done simply by passing the bufferto the zip/unzip methods or the <code>ZippedFS</code> object to zip method instead of the path, and it works for both asynchronous and synchronous versions. Notice that in the case of zipping a buffer you'll need to pass an extra argument after the buffer which is the name of the file that will be included in the zip.
 
 Here's an example implementing the above scenario that utilizes the ability to zip buffers :
 
@@ -141,7 +141,7 @@ server.listen(3000);
 
 While the library was designed to provide a simple high-level APIs to zip/unzip local directories and files, it's sometimes needed to perform some low level operations on the before exporting it like adding new files to the zip or removing some files form an unzipped file before writing to disk. And since this library is based on JSZip which provides these low level operations, starting from v0.2.0 you can access the underlying <code>JSZip</code> object and all its low level features through the method <code>ZipExport#lowLevel()</code>. After you zip/unzip your data and acquire the <code>ZipExport</code> object, you can call this method from it and retrieve the underlying <code>JSZip</code> object and play around with it.
 
-Here's an example that utilizes the low level operations to remove files and also utilizes the ability to zipe <code>ZippedFS</code> object. This code cleans zipped files from executables (namely .exe, .bat, and .sh):
+Here's an example that utilizes the low level operations to remove files and also utilizes the ability to zip <code>ZippedFS</code> object. This code cleans zipped files from executables (namely .exe, .bat, and .sh):
 
 ```javascript
 var zipper = require('zip-local');
