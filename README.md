@@ -1,4 +1,4 @@
-﻿# zip-local
+# zip-local
 
 ## Why another one?!
 
@@ -107,6 +107,52 @@ console.log(unzippedfs.contents());
 var buff = unzippedfs.read("cpp/hello-world.cpp", "buffer");
 ```
 
+### Zipping/Unzipping directly from memory
+
+Imagine a serevr that needs to zip files it receives through its clients and send the zipped file to the client. When the file is received it resides in a buffer in memory, and to be able to zip it with the library (using the methods described so far) we must first save the file to local storage then zip it using its path so that the library would read it back to memory and zip it. This is definitely ineffcient and wasteful of the serevr's time and resources.
+
+To solve this issue, starting from v0.2.0 you can zip/unzip a file directly from the buffer containing it in memory. This could be done simply by passing the buffer itself to the zip/unzip methods instead of the path and it works for both asynchronous and synchronous versions. Notice that in the case of zipping you'll need to pass an extra argument after the buffer which is the name of the file that will be included in the zip.
+
+Here's an example implementing the above scenario:
+
+```javascript
+var zipper = require('zip-local');
+var net = require('net');
+
+var server = net.createServer(function (socket) {
+    
+    socket.on('data', function(data) {
+        
+        zipper.zip(data, "remote_file", function(zipped) {
+            
+            // cache a copy of the zipped file on the server
+            zipped.save("zipped_from" + socket.remoteAddress + ".zip");
+            
+            // send the zipped file back to the client
+            socket.write(zipped.memory());
+        });
+    });
+});
+
+server.listen(3000);
+```
+
+### Low Level Operations
+
+While the library was designed to provide a simple high-level APIs to zip/unzip local directories and files, it's sometimes needed to perform some low level operations on the before exporting it like adding new files to the zip or removing some files form an unzipped file before writing to disk. And since this library is based on JSZip which provides these low level operations, starting from v0.2.0 you can access the underlying <code>JSZip</code> object and all its low level features through the method <code>ZipExport#lowLevel()</code>. After you zip/unzip your data and acquire the <code>ZipExport</code> object, you can call this method from it and retrieve the underlying <code>JSZip</code> object and play around with it.
+
+Here's an example on removing files from unzipped data:
+
+```javascript
+var zipper = require('zip-local');
+
+zipper.unzip('pack.zip', function(unzipped) {
+
+    unzipped.lowLevel().remove('cpp/hello-world.cpp');
+    
+    unzipped.save();
+});
+```
 read the [API documentations](https://github.com/Mostafa-Samir/zip-local/wiki/API-Documentation) for furthur details.
 
 ## License
