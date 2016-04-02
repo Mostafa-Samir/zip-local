@@ -21,29 +21,33 @@ function extract_to(_path, jszip, callback) {
     // make sure that the extraction path points to a existing directory
     fs.stat(extraction_path, function (err, stats) {
 
-        if (err)
-            throw new Error(extraction_path + " doesn't exist");
+        if (err) {
+            callback(err);
+            return;
+        }
 
-        if (!stats.isDirectory())
-            throw new Error(extraction_path + " is not a directory");
+        if (!stats.isDirectory()) {
+            callback(new Error(extraction_path + " is not a directory"));
+            return;
+        }
 
         // sort out the unzipped file to directories and files
         var dirs = [];
         var files = [];
         for (var name in jszip.files) {
-            
+
             var entry = jszip.files[name];
-            
+
             if (entry.dir)
                 dirs.push(name);
             else
                 files.push(name);
         }
-        
+
         // sort the directories ascendingy by level
         dirs.sort(function (a, b) {
             function dir_sep_count(dir) { return (dir.match(/\//g) || []).length; }
-            
+
             return dir_sep_count(a) - dir_sep_count(b);
         });
 
@@ -53,37 +57,49 @@ function extract_to(_path, jszip, callback) {
         // create the directories
         async.eachSeries(dirs, function (dir, end_iteration) {
 
-            fs.mkdir(dir, function () {
+            fs.mkdir(dir, function (err) {
                 // end of this iteration
+                if(err) {
+                    end_iteration(err);
+                    return;
+                }
                 end_iteration();
             });
 
         }, function (err) {
-            
-            if (err)
-                throw err;
+
+            if (err) {
+                callback(err);
+            }
 
             // write the files
-            async.each(files, function (file, end_iteration) { 
+            async.each(files, function (file, end_iteration) {
 
                 var data = jszip.file(file).asNodeBuffer();
 
                 fs.writeFile(file, data, function (err) {
-                    
-                    if (err)
-                        throw err;
-                    
+
+                    if (err) {
+                        end_iteration(err);
+                        return;
+                    }
+
                     // end of this iteration
                     end_iteration();
 
                 });
-            }, function (err) { 
-                
+            }, function (err) {
+
+                if(err) {
+                    callback(err);
+                    return;
+                }
+
                 // change the process working directory back
                 process.chdir(current_working_dirctory);
 
                 // invoke the callback
-                callback();
+                callback(null);
             });
         });
     });
@@ -95,17 +111,17 @@ function extract_to(_path, jszip, callback) {
  * @param jszip {JSZip}: the jszip object containg the unzipped file
  */
 function extract_to_sync(_path, jszip) {
-    
+
     var extraction_path = _path === null ? "./" : path.normalize(_path);
     var current_working_dirctory = process.cwd();
-    
+
     // make sure that the extraction path points to a existing directory
     var stats;
     try { stats = fs.statSync(extraction_path); }
     catch (err) { throw new Error(extraction_path + " doesn't exist"); }
     if (!stats.isDirectory())
         throw new Error(extraction_path + " is not a directory");
-    
+
     // sort out the unzipped file to directories and files
     var dirs = [];
     var files = [];
@@ -118,11 +134,11 @@ function extract_to_sync(_path, jszip) {
         else
             files.push(name);
     }
-    
+
     // sort the directories ascendingy by level
     dirs.sort(function (a, b) {
         function dir_sep_count(dir) { return (dir.match(/\//g) || []).length; }
-        
+
         return dir_sep_count(a) - dir_sep_count(b);
     });
 
@@ -148,7 +164,7 @@ function extract_to_sync(_path, jszip) {
 
 
 /*****************************************************************************************
-********************************** MODULE PUBLIC APIS ************************************ 
+********************************** MODULE PUBLIC APIS ************************************
 ***** THE MODULE CONTAINS THE APIS THAT DEAL WITH EXPORTING AFTER ZIPPING IS COMPLETE ****
 *****************************************************************************************/
 
@@ -159,16 +175,16 @@ function extract_to_sync(_path, jszip) {
  * @param async {Boolean}: a flag to indicate whether the zipping was asynchrnously
  */
 function ZipExport(jszip, unzipped, async) {
-    
+
     // hold the JSZip for exporting
     this.content = jszip;
-    
+
     // determines if the exported will be compressed
     this.compressed = false;
-    
-    // determines if the source is an unzipped file 
+
+    // determines if the source is an unzipped file
     this.src_unzipped = unzipped ? true : false;
-    
+
     // determines if the exported file will be written asynchronously
     this.save_async = async ? true : false;
 }
@@ -180,7 +196,7 @@ function ZipExport(jszip, unzipped, async) {
 ZipExport.prototype.lowLevel = function () {
 
     return this.content;
-} 
+}
 
 /*
  * sets the object so that the exported format will be compressed
@@ -189,7 +205,7 @@ ZipExport.prototype.compress = function () {
 
     if(!this.src_unzipped)
         this.compressed = true;
-    
+
     return this;
 }
 
@@ -198,7 +214,7 @@ ZipExport.prototype.compress = function () {
  * @return {Buffer|ZippedFS}: Buffer for a zipped file, a ZippedFS object for unzipped
  */
 ZipExport.prototype.memory = function() {
-    
+
     if (!this.src_unzipped) {
 
         // generate the zipped buffer
@@ -206,7 +222,7 @@ ZipExport.prototype.memory = function() {
             type: "nodebuffer",
             compression: this.compressed ? "DEFLATE" : undefined
         });
-        
+
         return new Buffer(buff);
     }
     else {
@@ -222,25 +238,25 @@ ZipExport.prototype.memory = function() {
  * @param _callback {Function}: the function to be called when the save is done (only in async zipping)
  */
 ZipExport.prototype.save = function (_path, _callback) {
-    
+
     var callback = _callback || function () { };
-    
+
     if (!this.src_unzipped) {
         // generate the zipped buffer
         var buff = this.content.generate({
             type: "nodebuffer",
             compression: this.compressed ? "DEFLATE" : undefined
         });
-        
+
         var normalized_path = path.normalize(_path);
         var parsed_path = path.parse(normalized_path);
         var current_working_directory = process.cwd();
-        
-        
+
+
         // change process's directory to save directory if exists
         if (parsed_path.dir !== '')
             process.chdir(parsed_path.dir);
-        
+
         // write the new file
         if (!this.save_async) {
 
@@ -251,20 +267,22 @@ ZipExport.prototype.save = function (_path, _callback) {
         }
         else
             fs.writeFile(parsed_path.base, buff, function (err) {
-                
-                if (err)
-                    throw err;
-                
+
+                if (err) {
+                    callback(err);
+                    return;
+                }
+
                 // change process's directory back
                 process.chdir(current_working_directory);
-                
+
                 //invoke the callback
-                callback();
+                callback(null);
 
             });
     }
     else {
-        
+
         // extract the unzipped file to given directory
         if (!this.save_async)
             extract_to_sync(_path ? _path : null, this.content);

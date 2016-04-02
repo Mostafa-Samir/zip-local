@@ -37,7 +37,9 @@ describe("Zipping files asynchrnously", function () {
 
             expect(error).to.equal(null);
 
-            zipped.save("./tests/assets/files.async.T3Pack.zip", function () {
+            zipped.save("./tests/assets/files.async.T3Pack.zip", function (error) {
+
+                expect(error).to.equal(null);
 
                 // make sure that the file exists on disk
                 fs.readdir("./tests/assets/", function (err, entries) {

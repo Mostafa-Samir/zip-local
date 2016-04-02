@@ -38,7 +38,8 @@ describe("Unzipping asynchronously", function () {
                 if (err)
                     throw err;
 
-                unzipped.save("./tests/assets/hello-async-unzip/", function () {
+                unzipped.save("./tests/assets/hello-async-unzip/", function (error) {
+                    expect(error).to.equal(null);
                     done();
                 });
             });
