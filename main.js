@@ -233,10 +233,14 @@ ZipLocal.unzip = function (file, _callback) {
 
         fs.readFile(normalized_path, function (err, data) {
 
+            if(err) {
+                callback(err);
+            }
+
             zipped_obj.load(data);
 
             //invoke the callback
-            callback(new ZipExport(zipped_obj, true, true))
+            callback(null, new ZipExport(zipped_obj, true, true))
 
         });
     }
@@ -247,10 +251,10 @@ ZipLocal.unzip = function (file, _callback) {
         zipped_obj.load(file);
 
         //invoke the callback
-        callback(new ZipExport(zipped_obj, true, true))
+        callback(null, new ZipExport(zipped_obj, true, true))
     }
     else {
-        throw new Error("Unsupported type: data is neither a path or a Buffer");
+        callback(new Error("Unsupported type: data is neither a path or a Buffer"));
     }
 
 }

@@ -10,7 +10,9 @@ describe("Unzipping asynchronously", function () {
 
     it("should unzip a .zip file in memory without errors", function (done) {
 
-        zipper.unzip("./tests/assets/hello.zip", function (unzipped) {
+        zipper.unzip("./tests/assets/hello.zip", function (error, unzipped) {
+
+            expect(error).to.equal(null);
 
             localMemory.T1ZippedFS = unzipped.memory();
 
@@ -28,7 +30,9 @@ describe("Unzipping asynchronously", function () {
 
     it("should unzip a .zip file to disk without errors", function (done) {
 
-        zipper.unzip("./tests/assets/hello.zip", function (unzipped) {
+        zipper.unzip("./tests/assets/hello.zip", function (error, unzipped) {
+
+            expect(error).to.equal(null);
 
             fs.mkdir("./tests/assets/hello-async-unzip", function (err) {
                 if (err)
@@ -66,7 +70,9 @@ describe("Unzipping asynchronously", function () {
 
         var buff = fs.readFileSync("./tests/assets/hello.zip");
 
-        zipper.unzip(buff, function (unzipped) {
+        zipper.unzip(buff, function (error, unzipped) {
+
+            expect(error).to.equal(null);
 
             localMemory.T5ZippedFS = unzipped.memory();
 
