@@ -16,16 +16,13 @@ var dir_list = [
 ];
 
 async.each(file_list, function (file, callback) {
-    
+
     fs.unlink(file, function (err) {
-        
-        if (err)
-            throw err;
-        
+
         callback();
     });
 
-}, function (err) { 
+}, function (err) {
 
     if (err)
         throw err;
@@ -34,9 +31,6 @@ async.each(file_list, function (file, callback) {
 async.each(dir_list, function (dir, callback) {
 
     rm_rf(dir, function (err) {
-
-        if (err)
-            throw err;
 
         callback();
     });
