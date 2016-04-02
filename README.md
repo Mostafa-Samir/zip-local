@@ -22,7 +22,7 @@ The API comes in two versions: an asynchrnous version and a synchronous one. Thi
 
 ### Zipping
 
-Zipping is done through <code>ZipLocal.zip</code> or its synchronous version <code> ZipLocal.sync.zip</code> by passing the path to the file or directory that needs to be zipped. In the asynchrnous version, the callback is passed an instance of <code> ZipExport</code> object that contains the APIs to export the 
+Zipping is done through <code>ZipLocal.zip</code> or its synchronous version <code> ZipLocal.sync.zip</code> by passing the path to the file or directory that needs to be zipped. In the asynchrnous version, the callback is passed an instance of <code> ZipExport</code> object that contains the APIs to export the
 zipped file. In the synchronous version, the <code>ZipExport</code> object is returned.
 
 Here's an example of asynchronous zipping,
@@ -31,16 +31,20 @@ Here's an example of asynchronous zipping,
 var zipper = require("zip-local");
 
 // zipping a file
-zipper.zip("./hello-world.cpp", function(zipped) {
-	
-    zipped.compress(); // compress before exporting
-    
-	var buff = zipped.memory(); // get the zipped file as a Buffer
-    
-    // or save the zipped file to disk
-    zipped.save("../package.zip", function() {
-    	console.log("saved successfully !");
-    });
+zipper.zip("./hello-world.cpp", function(error, zipped) {
+
+	if(!error) {
+    	zipped.compress(); // compress before exporting
+
+		var buff = zipped.memory(); // get the zipped file as a Buffer
+
+    	// or save the zipped file to disk
+    	zipped.save("../package.zip", function(error) {
+			if(!error) {
+				console.log("saved successfully !");
+			}
+    	});
+	}
 });
 ```
 
@@ -71,21 +75,23 @@ An example for asynchronous unzipping,
 ```javascript
 var zipper = require('zip-local');
 
-zipper.unzip("../package.zip", function(unzipped) {
-	
-    // extract to the current working directory
-    unzipped.save(null, function() { });
-    
-    var unzippedfs = unzipped.memory();
-    
-    // print an array of file paths in the unzipped file
-    console.log(unzippedfs.contents()); // prints [ 'hello-world.cpp' ]
-    
-    // read the file as text
-    var txt = unzippedfs.read("hello-world.cpp", 'text');
-    
-    // or read it as Buffer
-    var buff = unzippedfs.read("hello-world.cpp", 'buffer');
+zipper.unzip("../package.zip", function(error, unzipped) {
+
+	if(!error) {
+    	// extract to the current working directory
+    	unzipped.save(null, function() { });
+
+    	var unzippedfs = unzipped.memory();
+
+    	// print an array of file paths in the unzipped file
+    	console.log(unzippedfs.contents()); // prints [ 'hello-world.cpp' ]
+
+    	// read the file as text
+    	var txt = unzippedfs.read("hello-world.cpp", 'text');
+
+    	// or read it as Buffer
+    	var buff = unzippedfs.read("hello-world.cpp", 'buffer');
+	}
 });
 ```
 
@@ -101,7 +107,7 @@ zipper.sync.unzip("pack.zip").save("../../hello");
 var unzippedfs = zipper.sync.unzip("pack.zip").memory();
 
 // logs ['hello-world.txt', 'cpp/hello-world.cpp', 'java/hello-world.java']
-console.log(unzippedfs.contents()); 
+console.log(unzippedfs.contents());
 
 // read file in buffer
 var buff = unzippedfs.read("cpp/hello-world.cpp", "buffer");
@@ -120,14 +126,24 @@ var zipper = require('zip-local');
 var net = require('net');
 
 var server = net.createServer(function (socket) {
-    
+
     socket.on('data', function(data) {
-        
-        zipper.zip(data, "remote_file", function(zipped) {
-            
+
+        zipper.zip(data, "remote_file", function(error, zipped) {
+
+			if(error) {
+				console.log("ERROR: %s", error.message);
+				return;
+			}
+
             // cache a copy of the zipped file on the server
-            zipped.save("zipped_from" + socket.remoteAddress + ".zip");
-            
+            zipped.save("zipped_from" + socket.remoteAddress + ".zip", function(error) {
+				if(error) {
+					console.log("ERROR: %s", error.message);
+					return;
+				}
+			});
+
             // send the zipped file back to the client
             socket.write(zipped.memory());
         });
@@ -146,24 +162,34 @@ Here's an example that utilizes the low level operations to remove files and als
 ```javascript
 var zipper = require('zip-local');
 
-zipper.unzip('package.zip', function(unzipped) {
+zipper.unzip('package.zip', function(error, unzipped) {
+
+	if(error) {
+		console.log("ERROR: %s", error.message);
+		return;
+	}
 
     var unzippedFS = unzipped.memory();
     var files = unzippedFS.contents();
     var notExecRegExp = new RegExp(/^[^.]+$|\.(?!(sh|exe|bat)$)([^.]+$)/);
-    
+
     files.forEach(function (file) {
         if(!notExecRegExp.test(file))
             unzipped.lowLevel().remove(file);
     });
-    
+
     var cleanUnzippedFS = unzipped.memory();
-    
+
     // re-zip the clean ZippedFS
     zipper.zip(cleanUnzippedFS, function(zipped) {
-        
-        zipped.save("package.zip", function() {
-            console.log("The file is scanned and cleaned of executables");
+
+        zipped.save("package.zip", function(error) {
+			if(error) {
+				console.log("ERROR: %s", error.message);
+			}
+			else {
+            	console.log("The file is scanned and cleaned of executables");
+			}
         });
     });
 });
