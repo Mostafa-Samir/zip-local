@@ -155,7 +155,7 @@ server.listen(3000);
 
 ### Low Level Operations
 
-While the library was designed to provide a simple high-level APIs to zip/unzip local directories and files, it's sometimes needed to perform some low level operations on the before exporting it like adding new files to the zip or removing some files form an unzipped file before writing to disk. And since this library is based on JSZip which provides these low level operations, starting from v0.2.0 you can access the underlying <code>JSZip</code> object and all its low level features through the method <code>ZipExport#lowLevel()</code>. After you zip/unzip your data and acquire the <code>ZipExport</code> object, you can call this method from it and retrieve the underlying <code>JSZip</code> object and play around with it.
+While the library was designed to provide a simple high-level APIs to zip/unzip local directories and files, it's sometimes needed to perform some low level operations on the data before exporting it like adding new files to the zip or removing some files form an unzipped file before writing to disk. And since this library is based on JSZip which provides these low level operations, starting from v0.2.0 you can access the underlying <code>JSZip</code> object and all its low level features through the method <code>ZipExport#lowLevel()</code>. After you zip/unzip your data and acquire the <code>ZipExport</code> object, you can call this method from it and retrieve the underlying <code>JSZip</code> object and play around with it.
 
 Here's an example that utilizes the low level operations to remove files and also utilizes the ability to zip <code>ZippedFS</code> object. This code cleans zipped files from executables (namely .exe, .bat, and .sh):
 
