@@ -5,6 +5,7 @@
   "main": "main.js",
   "scripts": {
     "test": "./node_modules/.bin/mocha ./tests/*.test.js",
+    "pretest": "node ./tests/cleanup.js",
     "posttest": "node ./tests/cleanup.js"
   },
   "directories": {
