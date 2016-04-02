@@ -21,8 +21,10 @@ function zip_dir(dir, zipped_dir) {
 
     fs.readdir(dir, function (err, entries) {
 
-        if (err)
+        if (err) {
             deferred.reject(err);
+            return;
+        }
 
         var entries_paths = entries.map(function (entry) {
             return path.normalize(dir + path.sep + entry);
@@ -30,8 +32,10 @@ function zip_dir(dir, zipped_dir) {
 
         async.map(entries_paths, fs.stat, function (err, stats) {
 
-            if(err)
+            if(err) {
                 deffered.reject(err);
+                return;
+            }
 
             var entries_count = entries_paths.length;
 
@@ -66,8 +70,10 @@ function zip_dir(dir, zipped_dir) {
 
                     fs.readFile(entry.path, function (err, data) {
 
-                        if (err)
+                        if (err) {
                             callback(err);
+                            return;
+                        }
 
                         //zip the file within the current subdir
                         zipped_dir.file(parsed_entry_path.base, data);
@@ -82,9 +88,9 @@ function zip_dir(dir, zipped_dir) {
                 // here all iterations are over
                 if (err)
                     deffered.reject(err);
-
-                // resolve the deffered and fullfil the promise
-                deferred.resolve();
+                else
+                    // resolve the deffered and fullfil the promise
+                    deferred.resolve();
             });
         });
     });
@@ -155,8 +161,10 @@ ZipLocal.zip = function (entity, _callback, _shiftedCallback) {
 
         fs.stat(normalized_path, function (err, stats) {
 
-            if (err)
+            if (err) {
                 callback(err);
+                return;
+            }
 
             if (stats.isDirectory()) {
 
@@ -175,8 +183,10 @@ ZipLocal.zip = function (entity, _callback, _shiftedCallback) {
                 var parsed_path = path.parse(normalized_path);
                 fs.readFile(normalized_path, function (err, file) {
 
-                    if (err)
+                    if (err) {
                         callback(err);
+                        return;
+                    }
 
                     zipped_obj.file(parsed_path.base, file);
 
@@ -235,6 +245,7 @@ ZipLocal.unzip = function (file, _callback) {
 
             if(err) {
                 callback(err);
+                return;
             }
 
             zipped_obj.load(data);
