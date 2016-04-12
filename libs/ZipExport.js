@@ -16,7 +16,9 @@ var ZippedFS = require('./ZippedFS.js');
 function extract_to(_path, jszip, callback) {
 
     var extraction_path = _path === null ? "./" : path.normalize(_path);
-    var current_working_dirctory = process.cwd();
+    if(extraction_path[extraction_path.length - 1] !== path.sep) {
+        extraction_path += path.sep;
+    }
 
     // make sure that the extraction path points to a existing directory
     fs.stat(extraction_path, function (err, stats) {
@@ -51,13 +53,11 @@ function extract_to(_path, jszip, callback) {
             return dir_sep_count(a) - dir_sep_count(b);
         });
 
-        // change process's working directory to extraction directory
-        process.chdir(extraction_path);
 
         // create the directories
         async.eachSeries(dirs, function (dir, end_iteration) {
 
-            fs.mkdir(dir, function (err) {
+            fs.mkdir(extraction_path + dir, function (err) {
                 // end of this iteration
                 if(err) {
                     end_iteration(err);
@@ -70,6 +70,7 @@ function extract_to(_path, jszip, callback) {
 
             if (err) {
                 callback(err);
+                return;
             }
 
             // write the files
@@ -77,7 +78,7 @@ function extract_to(_path, jszip, callback) {
 
                 var data = jszip.file(file).asNodeBuffer();
 
-                fs.writeFile(file, data, function (err) {
+                fs.writeFile(extraction_path + file, data, function (err) {
 
                     if (err) {
                         end_iteration(err);
@@ -95,9 +96,6 @@ function extract_to(_path, jszip, callback) {
                     return;
                 }
 
-                // change the process working directory back
-                process.chdir(current_working_dirctory);
-
                 // invoke the callback
                 callback(null);
             });
@@ -113,7 +111,9 @@ function extract_to(_path, jszip, callback) {
 function extract_to_sync(_path, jszip) {
 
     var extraction_path = _path === null ? "./" : path.normalize(_path);
-    var current_working_dirctory = process.cwd();
+    if(extraction_path[extraction_path.length - 1] !== path.sep) {
+        extraction_path += path.sep;
+    }
 
     // make sure that the extraction path points to a existing directory
     var stats;
@@ -142,12 +142,10 @@ function extract_to_sync(_path, jszip) {
         return dir_sep_count(a) - dir_sep_count(b);
     });
 
-    // change process's working directory to extraction directory
-    process.chdir(extraction_path);
 
     // create the directories
     dirs.forEach(function (dir) {
-        fs.mkdirSync(dir);
+        fs.mkdirSync(extraction_path + dir);
     });
 
     // write the files
@@ -155,11 +153,9 @@ function extract_to_sync(_path, jszip) {
 
         var data = jszip.file(file).asNodeBuffer();
 
-        fs.writeFileSync(file, data);
+        fs.writeFileSync(extraction_path + file, data);
     });
 
-    // change the process working directory back
-    process.chdir(current_working_dirctory);
 }
 
 
@@ -249,32 +245,20 @@ ZipExport.prototype.save = function (_path, _callback) {
         });
 
         var normalized_path = path.normalize(_path);
-        var parsed_path = path.parse(normalized_path);
-        var current_working_directory = process.cwd();
-
-
-        // change process's directory to save directory if exists
-        if (parsed_path.dir !== '')
-            process.chdir(parsed_path.dir);
 
         // write the new file
         if (!this.save_async) {
 
-            fs.writeFileSync(parsed_path.base, buff);
+            fs.writeFileSync(normalized_path, buff);
 
-            // change process's directory back
-            process.chdir(current_working_directory);
         }
         else
-            fs.writeFile(parsed_path.base, buff, function (err) {
+            fs.writeFile(normalized_path, buff, function (err) {
 
                 if (err) {
                     callback(err);
                     return;
                 }
-
-                // change process's directory back
-                process.chdir(current_working_directory);
 
                 //invoke the callback
                 callback(null);
