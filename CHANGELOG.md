@@ -1,4 +1,4 @@
-#v0.3.1
+# v0.3.1
 Released 4/12/2016
 * Fixed bug reported in issue #4
 
