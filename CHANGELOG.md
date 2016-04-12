@@ -1,3 +1,7 @@
+#v0.3.1
+Released 4/12/2016
+* Fixed bug reported in issue #4
+
 # v0.3.0
 Released 4/2/2016
 * Improved asynchronous error handeling by passing any error that occurs as the first argument of any callback function.
