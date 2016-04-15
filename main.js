@@ -33,7 +33,7 @@ function zip_dir(dir, zipped_dir) {
         async.map(entries_paths, fs.stat, function (err, stats) {
 
             if(err) {
-                deffered.reject(err);
+                deferred.reject(err);
                 return;
             }
 
@@ -87,9 +87,9 @@ function zip_dir(dir, zipped_dir) {
 
                 // here all iterations are over
                 if (err)
-                    deffered.reject(err);
+                    deferred.reject(err);
                 else
-                    // resolve the deffered and fullfil the promise
+                    // resolve the deferred and fullfil the promise
                     deferred.resolve();
             });
         });
