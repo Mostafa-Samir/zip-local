@@ -1,4 +1,4 @@
-var fs = require('fs');
+var fs = require('graceful-fs');
 var path = require('path');
 var JSZip = require('jszip');
 var Q = require('q');
