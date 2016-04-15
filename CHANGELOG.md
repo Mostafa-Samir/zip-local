@@ -1,3 +1,7 @@
+# v0.3.2
+Released 4/15/2016
+* Used `graceful-fs` instead of native `fs` to avoid having **EMFILE** errors.
+
 # v0.3.1
 Released 4/12/2016
 * Fixed bug reported in issue #4
