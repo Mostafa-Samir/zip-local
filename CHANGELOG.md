@@ -1,3 +1,7 @@
+# v0.3.3
+Released 4/22/2016
+* Defaulted the `createFolders` options in JSZip to `true` everywhere to ensure the conversion of logical directories in zip files to real ones, thus avoiding errors in extracting.
+
 # v0.3.2
 Released 4/15/2016
 * Used `graceful-fs` instead of native `fs` to avoid having **EMFILE** errors.
