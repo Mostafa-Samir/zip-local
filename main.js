@@ -7,7 +7,7 @@ var ZipExport = require('./libs/ZipExport.js');
 var ZippedFS = require('./libs/ZippedFS.js');
 
 /*
- * factory method to create jszip objects where 'createFolder'
+ * factory method to create jszip objects where 'createFolders'
  * option is the default behavior everywhere
  */
  JSZip.make = function(data, options) {
@@ -33,7 +33,7 @@ var ZippedFS = require('./libs/ZippedFS.js');
          if(!data) {
              return originals.file.call(instance, name);
          }
-         
+
          return originals.file.call(instance, name, data, augment(options));
      };
 
