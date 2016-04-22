@@ -33,18 +33,18 @@ var zipper = require("zip-local");
 // zipping a file
 zipper.zip("./hello-world.cpp", function(error, zipped) {
 
-	if(!error) {
-    	zipped.compress(); // compress before exporting
+    if(!error) {
+        zipped.compress(); // compress before exporting
 
-		var buff = zipped.memory(); // get the zipped file as a Buffer
+        var buff = zipped.memory(); // get the zipped file as a Buffer
 
-    	// or save the zipped file to disk
-    	zipped.save("../package.zip", function(error) {
-			if(!error) {
-				console.log("saved successfully !");
-			}
-    	});
-	}
+        // or save the zipped file to disk
+        zipped.save("../package.zip", function(error) {
+            if(!error) {
+                console.log("saved successfully !");
+            }
+        });
+    }
 });
 ```
 
@@ -77,21 +77,21 @@ var zipper = require('zip-local');
 
 zipper.unzip("../package.zip", function(error, unzipped) {
 
-	if(!error) {
-    	// extract to the current working directory
-    	unzipped.save(null, function() { });
+    if(!error) {
+        // extract to the current working directory
+        unzipped.save(null, function() { });
 
-    	var unzippedfs = unzipped.memory();
+        var unzippedfs = unzipped.memory();
 
-    	// print an array of file paths in the unzipped file
-    	console.log(unzippedfs.contents()); // prints [ 'hello-world.cpp' ]
+        // print an array of file paths in the unzipped file
+        console.log(unzippedfs.contents()); // prints [ 'hello-world.cpp' ]
 
-    	// read the file as text
-    	var txt = unzippedfs.read("hello-world.cpp", 'text');
+        // read the file as text
+        var txt = unzippedfs.read("hello-world.cpp", 'text');
 
-    	// or read it as Buffer
-    	var buff = unzippedfs.read("hello-world.cpp", 'buffer');
-	}
+        // or read it as Buffer
+        var buff = unzippedfs.read("hello-world.cpp", 'buffer');
+    }
 });
 ```
 
@@ -131,18 +131,18 @@ var server = net.createServer(function (socket) {
 
         zipper.zip(data, "remote_file", function(error, zipped) {
 
-			if(error) {
-				console.log("ERROR: %s", error.message);
-				return;
-			}
+            if(error) {
+                console.log("ERROR: %s", error.message);
+                return;
+            }
 
             // cache a copy of the zipped file on the server
             zipped.save("zipped_from" + socket.remoteAddress + ".zip", function(error) {
-				if(error) {
-					console.log("ERROR: %s", error.message);
-					return;
-				}
-			});
+                if(error) {
+                    console.log("ERROR: %s", error.message);
+                    return;
+                }
+            });
 
             // send the zipped file back to the client
             socket.write(zipped.memory());
@@ -164,10 +164,10 @@ var zipper = require('zip-local');
 
 zipper.unzip('package.zip', function(error, unzipped) {
 
-	if(error) {
-		console.log("ERROR: %s", error.message);
-		return;
-	}
+    if(error) {
+        console.log("ERROR: %s", error.message);
+        return;
+    }
 
     var unzippedFS = unzipped.memory();
     var files = unzippedFS.contents();
@@ -184,12 +184,12 @@ zipper.unzip('package.zip', function(error, unzipped) {
     zipper.zip(cleanUnzippedFS, function(zipped) {
 
         zipped.save("package.zip", function(error) {
-			if(error) {
-				console.log("ERROR: %s", error.message);
-			}
-			else {
-            	console.log("The file is scanned and cleaned of executables");
-			}
+            if(error) {
+                console.log("ERROR: %s", error.message);
+            }
+            else {
+                console.log("The file is scanned and cleaned of executables");
+            }
         });
     });
 });
