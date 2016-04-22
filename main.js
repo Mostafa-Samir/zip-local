@@ -6,6 +6,40 @@ var async = require('async')
 var ZipExport = require('./libs/ZipExport.js');
 var ZippedFS = require('./libs/ZippedFS.js');
 
+/*
+ * factory method to create jszip objects where 'createFolder'
+ * option is the default behavior everywhere
+ */
+ JSZip.make = function(data, options) {
+
+     // augments the options object with a 'createFolders' option
+     function augment(_opts) {
+         var opts = _opts || {};
+         opts.createFolders = opts.createFolders || true;
+         return opts;
+     }
+
+     var instance = new JSZip(data, augment(options));
+
+     var originals = {};
+     originals.load = instance.load;
+     originals.file = instance.file;
+
+     instance.load = function(data, options) {
+         return originals.load.call(instance, data, augment(options));
+     };
+
+     instance.file = function(name, data, options) {
+         if(!data) {
+             return originals.file.call(instance, name);
+         }
+         
+         return originals.file.call(instance, name, data, augment(options));
+     };
+
+     return instance;
+ };
+
 /*****************************************************************************************
 ******************************** PRIVATE HELPER FUNCTIONS ********************************
 *****************************************************************************************/
@@ -148,7 +182,7 @@ ZipLocal.sync = {} // container for the synchronous version of the the api
  */
 ZipLocal.zip = function (entity, _callback, _shiftedCallback) {
 
-    var zipped_obj = new JSZip();
+    var zipped_obj = JSZip.make();
 
     if (typeof entity === "string") {
 
@@ -233,7 +267,7 @@ ZipLocal.zip = function (entity, _callback, _shiftedCallback) {
 ZipLocal.unzip = function (file, _callback) {
 
     var callback = _callback || function () { };
-    var zipped_obj = new JSZip();
+    var zipped_obj = JSZip.make();
 
     if (typeof file === "string") {
 
@@ -278,7 +312,7 @@ ZipLocal.unzip = function (file, _callback) {
  */
 ZipLocal.sync.zip = function(entity, buffer_name) {
 
-    var zipped_obj = new JSZip();
+    var zipped_obj = JSZip.make();
 
     if (typeof entity === "string") {
 
@@ -330,7 +364,7 @@ ZipLocal.sync.zip = function(entity, buffer_name) {
  */
 ZipLocal.sync.unzip = function (file) {
 
-    var zipped_obj = new JSZip();
+    var zipped_obj = JSZip.make();
 
     if (typeof file === "string") {
 

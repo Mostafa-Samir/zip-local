@@ -23,7 +23,7 @@ describe("Zipping files asynchrnously", function () {
     /* Test 2: making sure that the zipped buffer from Test 1 contains correct data */
     it("checks if the zipped buffer contains correct data (using JSZip)", function () {
 
-        var zipped = new JSZip(localMemory.T1ZippedBuffer);
+        var zipped = JSZip.make(localMemory.T1ZippedBuffer);
 
         expect(zipped.files).to.have.property("hello-world") &&
         expect(zipped.file("hello-world").asText()).to.equal("Hello World.");
@@ -57,7 +57,7 @@ describe("Zipping files asynchrnously", function () {
 
         fs.readFile("./tests/assets/files.async.T3Pack.zip", function (err, data) {
 
-            var zipped = new JSZip(data);
+            var zipped = JSZip.make(data);
 
             expect(zipped.files).to.have.property("hello-world") &&
             expect(zipped.file("hello-world").asText()).to.equal("Hello World.");
@@ -84,7 +84,7 @@ describe("Zipping files asynchrnously", function () {
     /* Test 6: making sure that the zipped buffer from Test 5 contains correct data */
     it("checks if the zipped buffer contains correct data (using JSZip)", function () {
 
-        var zipped = new JSZip(localMemory.T5ZippedBuffer);
+        var zipped = JSZip.make(localMemory.T5ZippedBuffer);
 
         expect(zipped.files).to.have.property("hello-world") &&
         expect(zipped.file("hello-world").asText()).to.equal("Hello World.");
