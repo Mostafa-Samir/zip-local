@@ -20,9 +20,8 @@ describe("Logical to Real Directories Conversion", function() {
 
     it('converts logical directories in an existing zip file (sync)', function() {
         var unzipped = zipper.sync.unzip('./tests/assets/folders.zip')
-        expect(unzipped.lowLevel().files).to.include.keys('folder1');
+        expect(unzipped.lowLevel().files).to.include.keys('folder1/');
         expect(unzipped.lowLevel().files['folder1/'].dir).to.be.true;
-        done();
     });
 
     it('converts logical directories in low-level added files', function() {
