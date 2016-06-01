@@ -95,6 +95,7 @@ describe("Unzipping asynchronously", function () {
 
             unzipped.save("./tests/assets/hello-unzip-exists", function(error) {
                 expect(error).to.be.null;
+                done();
             });
         });
     });
