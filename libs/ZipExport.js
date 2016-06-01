@@ -57,13 +57,26 @@ function extract_to(_path, jszip, callback) {
         // create the directories
         async.eachSeries(dirs, function (dir, end_iteration) {
 
-            fs.mkdir(extraction_path + dir, function (err) {
-                // end of this iteration
-                if(err) {
+            //check first if the directory exists
+            fs.stat(extraction_path + dir, function(err, stats) {
+                if((err && err.code === "ENOENT") || !stats.isDirectory()) {
+                    // create the directory if it doesn't exist
+                    fs.mkdir(extraction_path + dir, function (err) {
+                        // end of this iteration
+                        if(err) {
+                            end_iteration(err);
+                            return;
+                        }
+                        end_iteration();
+                    });
+                }
+                else if(err && err.code !== "ENOENT") {
                     end_iteration(err);
                     return;
                 }
-                end_iteration();
+                else {
+                    end_iteration();
+                }
             });
 
         }, function (err) {
@@ -145,7 +158,20 @@ function extract_to_sync(_path, jszip) {
 
     // create the directories
     dirs.forEach(function (dir) {
-        fs.mkdirSync(extraction_path + dir);
+        try {
+            var stats = fs.statSync(extraction_path + dir);
+            if(!stats.isDirectory()) {
+                throw new Error("!dir");
+            }
+        }
+        catch(err) {
+            if(err.code === "ENOENT" || err.message === "!dir") {
+                fs.mkdirSync(extraction_path + dir);
+            }
+            else {
+                throw err;
+            }
+        }
     });
 
     // write the files
