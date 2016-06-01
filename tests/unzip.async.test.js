@@ -89,4 +89,14 @@ describe("Unzipping asynchronously", function () {
         expect(localMemory.T5ZippedFS.read("hello/world/says-world", 'text')).to.equal("World");
     });
 
-})
+    it("uses existing folders without throwing EEXIST error", function(done) {
+        zipper.unzip("./tests/assets/hello.zip", function(error, unzipped) {
+            expect(error).to.be.null;
+
+            unzipped.save("./tests/assets/hello-unzip-exists", function(error) {
+                expect(error).to.be.null;
+            });
+        });
+    });
+
+});
