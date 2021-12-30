@@ -12,7 +12,9 @@ var file_list = [
 
 var dir_list = [
     "./tests/assets/hello-async-unzip",
-    "./tests/assets/hello-sync-unzip"
+    "./tests/assets/hello-sync-unzip",
+    "./tests/assets/zip-slip-async",
+    "./tests/assets/zip-slip-sync"
 ];
 
 async.each(file_list, function (file, callback) {

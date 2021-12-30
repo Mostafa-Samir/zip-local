@@ -46,6 +46,24 @@ describe("Unzipping asynchronously", function () {
         });
     });
 
+    it("should raise an error when an entry is outside extraction path", function (done) {
+        zipper.unzip("./tests/assets/zip-slip.zip", function(error, unzipped) {
+
+            expect(error).to.equal(null);
+
+            fs.mkdir("./tests/assets/zip-slip-async", function (err) {
+                if (err)
+                    throw err;
+
+                unzipped.save("./tests/assets/zip-slip-async", function (error) {
+                    expect(error).to.be.an("error");
+                    expect(error.message).to.equal("Entry is outside the extraction path");
+                    done();
+                });
+            });
+        });
+    });
+
     it("should check if unzipped files on disk contain correct data", function (done) {
 
         fs.readFile("./tests/assets/hello-async-unzip/hello/says-hello", 'utf8', function (err, data) {
