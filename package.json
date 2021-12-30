@@ -1,6 +1,6 @@
 {
   "name": "zip-local",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "very simple zipping/uzipping of local files and directories in node.js",
   "main": "main.js",
   "scripts": {
