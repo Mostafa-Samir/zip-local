@@ -29,8 +29,9 @@ describe("Unzipping synchronously", function () {
 
     it("should raise an error when an entry is outside extraction path", function () {
         fs.mkdirSync("./tests/assets/zip-slip-sync");
-        expect(
-            zipper.sync.unzip("./tests/assets/zip-slip.zip").save("./tests/assets/zip-slip-sync")
+        expect(function () {
+            zipper.sync.unzip("./tests/assets/zip-slip.zip").save("./tests/assets/zip-slip-sync");
+        }
         ).to.throw("Entry is outside the extraction path")
     });
 
