@@ -133,6 +133,7 @@ function extract_to(_path, jszip, callback) {
 function extract_to_sync(_path, jszip) {
 
     var extraction_path = _path === null ? "./" : path.normalize(_path);
+    var absolute_extraction_path = path.resolve(extraction_path);
     if(extraction_path[extraction_path.length - 1] !== path.sep) {
         extraction_path += path.sep;
     }
@@ -150,6 +151,12 @@ function extract_to_sync(_path, jszip) {
     for (var name in jszip.files) {
 
         var entry = jszip.files[name];
+
+        var extracted_entry_path = path.resolve(
+            path.join(absolute_extraction_path, name)
+        );
+        if (!extracted_entry_path.startsWith(absolute_extraction_path))
+            throw new Error("Entry is outside the extraction path")
 
         if (entry.dir)
             dirs.push(name);
