@@ -27,6 +27,13 @@ describe("Unzipping synchronously", function () {
         zipper.sync.unzip("./tests/assets/hello.zip").save("./tests/assets/hello-sync-unzip/");
     });
 
+    it("should raise an error when an entry is outside extraction path", function () {
+        fs.mkdirSync("./tests/assets/zip-slip-sync");
+        expect(
+            zipper.sync.unzip("./tests/assets/zip-slip.zip").save("./tests/assets/zip-slip-sync")
+        ).to.throw("Entry is outside the extraction path")
+    });
+
     it("checks if unzipped files on disk contain correct data", function (done) {
 
         fs.readFile("./tests/assets/hello-sync-unzip/hello/says-hello", 'utf8', function (err, data) {
