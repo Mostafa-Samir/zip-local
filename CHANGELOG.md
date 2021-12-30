@@ -1,3 +1,9 @@
+# v0.3.5
+Released 30/12/2021
+* Added checks for out of extraction directory files to prevent zip-slip attacks
+* Updated deprecated usage of `Buffer`
+* Updated dependencies versions to remove vulnerabilities reported by `npm audit`
+
 # v0.3.4
 Released 6/1/2016
 * Fixed bug reported in issue [#5](https://github.com/Mostafa-Samir/zip-local/issues/5)
